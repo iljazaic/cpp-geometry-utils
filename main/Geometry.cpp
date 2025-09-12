@@ -112,7 +112,7 @@ public:
     {
         // parametric form of vectors taken
         // check for divisions by zero
-        if (((line2.directionVector.y * directionVector.x) - (line2.directionVector.x * directionVector.y)) == 0 || line2.directionVector.x == 0)
+        if (((line2.directionVector.y * directionVector.x) - (line2.directionVector.x * directionVector.y)) == 0)
         {
             return NULL;
         }
