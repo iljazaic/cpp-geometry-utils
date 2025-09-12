@@ -1,12 +1,7 @@
 #include <cmath>
+#include <algorithm>
 
-
-
-
-
-
-
-class vector2d
+class Vector2d
 {
 public:
     double x;
@@ -14,28 +9,29 @@ public:
     double mag;
     double theta;
 
-    vector2d()
+    Vector2d()
     {
-        x = 0;
-        y = 0;
-        theta = 0;
-        mag = 0;
+        x = 0.0;
+        y = 0.0;
+        theta = 0.0;
+        mag = 0.0;
     }
 
-    vector2d(double x_, double y_)
+    Vector2d(double x_, double y_)
     {
         x = x_;
         y = y_;
         mag = sqrt(x * x + y * y);
-        theta = atan(y / x);
+        theta = atan2(y, x);
     }
 
-    vector2d(double theta_)
+    // create a unit vector with just an angle
+    Vector2d(double theta_)
     {
         theta = theta_;
         mag = 1;
-        x = asin(theta);
-        y = acos(theta);
+        x = sin(theta);
+        y = cos(theta);
     }
 
     void _normalize()
@@ -52,10 +48,12 @@ public:
         y = acos(theta) * mag;
     }
 
-    void _add(vector2d vector2)
+    void _add(Vector2d vector2)
     {
         x += vector2.x;
         y += vector2.y;
+        mag = sqrt(x * x + y * y);
+        theta = atan2(y, x);
     }
 
     void _rotate(double angle)
@@ -63,28 +61,74 @@ public:
         theta += angle;
         if (theta > 2 * M_PI)
         {
-            theta -= M_PI; // just to keep it more or less within the range of 0->2pi
+            theta -= 2 * M_PI; // just to keep it more or less within the range of 0->2pi
         } // i like the control :D
-        if (theta < 0)
+        if (theta < 0.0)
         {
-            theta = M_PI + theta;
+            theta = 2 * M_PI + theta;
         }
 
         x = asin(theta) * mag;
         y = acos(theta) * mag;
     }
 
-    double _scalarProduct(vector2d vector2)
+    double _scalarProduct(Vector2d vector2)
     {
         return x * vector2.x + y * vector2.y;
     }
-    double _angleWith(vector2d vector2)
+    double _angleWith(Vector2d vector2)
     {
         return acos(_scalarProduct(vector2) / (mag * vector2.mag));
     }
+
+    double distaceWith(Vector2d vector2)
+    {
+        return sqrt((x - vector2.x) * (x - vector2.x) + (y - vector2.y) * (y - vector2.y));
+    }
 };
 
-class vector3d
+class Line2d
+{
+public:
+    Vector2d pointVector;
+    Vector2d directionVector;
+    double scalar;
+
+    Line2d()
+    {
+        pointVector = *new Vector2d();
+        directionVector = *new Vector2d();
+        scalar = 0;
+    }
+
+    Line2d(Vector2d p1, Vector2d p2, double length)
+    {
+        pointVector = p1;
+        directionVector = p2;
+        scalar = length;
+    }
+
+    Vector2d getIntersectionPoint(Line2d line2)
+    {
+        // parametric form of vectors taken
+        // check for divisions by zero
+        if (((line2.directionVector.y * directionVector.x) - (line2.directionVector.x * directionVector.y)) == 0 || line2.directionVector.x == 0)
+        {
+            return NULL;
+        }
+        // derived algebraically on the spot. forgot the formula for 2d cross products 👉👈
+        double u = ((pointVector.y - line2.pointVector.y) * line2.directionVector.x - (pointVector.x - line2.pointVector.x) * line2.directionVector.y) / ((line2.directionVector.y * directionVector.x) - (line2.directionVector.x * directionVector.y));
+        double t = (pointVector.x - line2.pointVector.x + u * directionVector.x) / line2.directionVector.x;
+
+        return *new Vector2d(pointVector.x + directionVector.x * t, pointVector.y + directionVector.y * t);
+    }
+
+    Vector2d pointOfIntersection(Line2d line2) {
+
+    };
+};
+
+class Vector3d
 {
 public:
     double x;
@@ -92,25 +136,27 @@ public:
     double z;
     double mag;
     double theta;
+    double phi;
 
-    vector3d(){
-        x=0;
-        y=0;
-        z=0;
-        mag=0;
-        theta=0;
+    Vector3d()
+    {
+        x = 0.0;
+        y = 0.0;
+        z = 0.0;
+        mag = 0.0;
+        theta = 0.0;
+        phi = 0.0;
     }
 
-    vector3d(double x_, double y_, double z_){
+    Vector3d(double x_, double y_, double z_)
+    {
         x = x_;
-        y=y_;
-        z=z_;
-        mag = sqrt(x*x+y*y+z*z);
+        y = y_;
+        z = z_;
+        mag = sqrt(x * x + y * y + z * z);
+        theta = mag != 0.0 ? std::clamp(acos(z / mag), -1.0, 1.0) : 0.0;
+        phi = atan2(y, x);
     }
-    
-
-
-
 };
 
 class rectangle
@@ -118,19 +164,15 @@ class rectangle
 public:
     double height;
     double width;
-    vector2d normalVector;
-    vector2d locaion; // defines the bottom left corner of the rectangle
+    Vector2d normalVector;
+    Vector2d locaion; // defines the bottom left corner of the rectangle
 
-    rectangle(double height_, double width_, vector2d normalVector_, vector2d location_)
+    rectangle(double height_, double width_, Vector2d normalVector_, Vector2d location_)
     {
         height = height_;
         width = width_;
         normalVector_._normalize();
         normalVector = normalVector_;
         locaion = locaion;
-    }
-
-    _rotate()
-    {
     }
 };
