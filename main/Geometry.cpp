@@ -1,5 +1,6 @@
 #include <cmath>
 #include <algorithm>
+#include "Entities.cpp"
 
 class Vector2d
 {
@@ -108,19 +109,20 @@ public:
         scalar = length;
     }
 
-    Vector2d getIntersectionPoint(Line2d line2)
+    Vector2d *getIntersectionPoint(Line2d line2) // returns a pointer to a point lol but kinda like vector2d
     {
         // parametric form of vectors taken
-        // check for divisions by zero
         if (((line2.directionVector.y * directionVector.x) - (line2.directionVector.x * directionVector.y)) == 0)
         {
             return NULL;
         }
-        // derived algebraically on the spot. forgot the formula for 2d cross products 👉👈
-        double u = ((pointVector.y - line2.pointVector.y) * line2.directionVector.x - (pointVector.x - line2.pointVector.x) * line2.directionVector.y) / ((line2.directionVector.y * directionVector.x) - (line2.directionVector.x * directionVector.y));
-        double t = (pointVector.x - line2.pointVector.x + u * directionVector.x) / line2.directionVector.x;
+        // derived algebraically on the spot because forgot the substitution formula for 2d cross products 👉👈
+        double t = ((line2.pointVector.x - pointVector.x) * line2.directionVector.y -
+                    (line2.pointVector.y - pointVector.y) * line2.directionVector.x) /
+                   ((directionVector.x * line2.directionVector.y) -
+                    (directionVector.y * line2.directionVector.x));
 
-        return *new Vector2d(pointVector.x + directionVector.x * t, pointVector.y + directionVector.y * t);
+        return new Vector2d(pointVector.x + directionVector.x * t, pointVector.y + directionVector.y * t);
     }
 
     Vector2d pointOfIntersection(Line2d line2) {
@@ -176,3 +178,22 @@ public:
         locaion = locaion;
     }
 };
+
+
+class ViewportPolygon{
+    public:
+    std::vector<Vector2D> points;
+
+    ViewportPolygon(std::vector<Vector2d>&& points_) : points(std::move(points_)) {}
+
+
+    
+};
+
+
+class PlayerViewport{
+    public:
+    
+
+
+}
