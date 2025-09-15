@@ -1,4 +1,7 @@
 #include "Geometry.cpp"
+#include <vector>
+
+using std::vector;
 
 enum TEXTURES
 {
@@ -29,11 +32,13 @@ class Player
 public:
     Vector2d position;
     Vector2d direction;
+    PlayerViewport viewport;
 
     Player()
     {
         position = *(new Vector2d(0.0, 0.0));
         direction = *(new Vector2d(1.0, 1.0));
+        viewport = *new PlayerViewport();
         direction._normalize();
     };
 
@@ -56,16 +61,58 @@ public:
     Line2d lineOnMap;
     int brightness; // from 1 to 100?
 
-
-    Wall(Line2d line){
-        lineOnMap=line;
-        brightness=0;
+    Wall(Line2d line)
+    {
+        lineOnMap = line;
+        brightness = 0;
     }
-    Wall(Line2d line, enum TEXTURES texture_){
+    Wall(Line2d line, enum TEXTURES texture_)
+    {
         texture = texture_;
-        lineOnMap= lineOnMap;
-        brightness=0;
+        lineOnMap = lineOnMap;
+        brightness = 0;
     }
+};
+
+class MapEntity
+{
+public:
+    vector<Wall> wallConstruction;
+    vector<Player> playerList;
+
+    MapEntity(vector<Wall> &&wallConstruction_, vector<Player> &&playerList_) : wallConstruction(std::move(wallConstruction)) { playerList = *new vector<Player>; };
+
+    void addPlayer(Player &&player_)
+    {
+        playerList.push_back(player_);
+    }
+
+    void addWall(Wall &&newWall)
+    {
+        wallConstruction.push_back(newWall);
+    }
+};
+
+class PlayerViewport
+{
+public:
+    double viewportAngle;
+    double viewDistance;
+    double viewportResolution;
+    Vector2d viewportOrigin;
+    Vector2d viewportDirection;
+
+    PlayerViewport(){
+        viewportAngle = 45;
+        viewportResolution=90;
+        viewDistance=100;
+        viewportOrigin=*new Vector2d(0,0);
+        viewportDirection =*new Vector2d(0,0);
+    }
+
+    void scanViewport(){
+        
+    };
 
     
 };

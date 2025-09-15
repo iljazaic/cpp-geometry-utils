@@ -1,6 +1,5 @@
 #include <cmath>
 #include <algorithm>
-#include "Entities.cpp"
 
 class Vector2d
 {
@@ -193,7 +192,7 @@ class ViewportPolygon{
 
 class PlayerViewport{
     public:
-    
+        
 
 
 }
